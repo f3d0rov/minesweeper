@@ -1,0 +1,370 @@
+
+:root {
+	--major-color: #6274b3;
+	--minor-color: white;
+	--bg-color: #1b1b1b;
+	--bg-minor: #282b31;
+	--bad-input: #730000;
+	
+	--minefield-bg: #282828;
+
+	--header-tile: #2c2c2c;
+
+	--open-tile:             #282b31;
+	--open-tile-highlighted: #3c4965;
+	--close-tile:             #57585b;
+	--close-tile-highlighted: #697aae;
+
+	--line-name: #535353;
+	--highlighted-line-name: var(--minor-color);
+
+	--mines1: #6073ba;
+	--mines2: #2cee17;
+	--mines3: #fff422;
+	--mines4: #fc5f11;
+	--mines5: #e41c1c;
+	--mines6: #22ebe7;
+	--mines7: #1931e7;
+	--mines8: #fc11d9;
+}
+
+body {
+	color: var(--minor-color);
+	background-color: var(--bg-color);
+	font-family: "Ubuntu Sans", sans-serif;
+}
+
+input {
+	width: 60px;
+	padding: 2px;
+
+	font-family: "Ubuntu Mono", monospace;
+	font-size: 28px;
+	text-align: right;
+
+	background-color: var(--bg-minor);
+	color: var(--minor-color);
+	
+	border: none;
+	border-radius: 2px;
+
+	transition: background-color 0.1s ease-in-out;
+}
+
+input.bad {
+	background-color: var(--bad-input);
+}
+
+.button {
+	width: 300px;
+	padding: 2px;
+	margin: 2px;
+
+	font-family: "Ubuntu Mono", monospace;
+	font-size: 22px;
+	text-align: center;
+
+	background-color: var(--bg-minor);
+	color: var(--minor-color);
+	
+	border: none;
+	border-radius: 2px;
+
+	transition: color 0.1s ease-in-out,
+				background-color 0.1s ease-in-out;
+	
+	/* Thanks https://stackoverflow.com/a/4407335/8665933 */
+	-webkit-touch-callout: none; /* iOS Safari */
+      -webkit-user-select: none; /* Safari */
+       -khtml-user-select: none; /* Konqueror HTML */
+         -moz-user-select: none; /* Old versions of Firefox */
+          -ms-user-select: none; /* Internet Explorer/Edge */
+              user-select: none; /* Non-prefixed version, currently
+                                    supported by Chrome, Edge, Opera and Firefox */
+}
+
+.button:hover {
+	background-color: var(--major-color);
+	color: var(--minor-color);
+	cursor: pointer;
+}
+
+.button:active {
+	background-color: var(--minor-color);
+	color: var(--bg-color);
+	cursor: pointer;
+}
+
+.button.disabled {
+	color: var(--bg-color);
+}
+
+
+.switch {
+	width: 300px;
+	padding: 2px;
+	margin: 2px;
+
+	font-family: "Ubuntu Mono", monospace;
+	font-size: 22px;
+	text-align: center;
+
+	background-color: var(--bg-minor);
+	color: var(--minor-color);
+	
+	border: none;
+	border-radius: 2px;
+
+	transition: color 0.1s ease-in-out,
+				background-color 0.1s ease-in-out;
+	
+	/* Thanks https://stackoverflow.com/a/4407335/8665933 */
+	-webkit-touch-callout: none; /* iOS Safari */
+      -webkit-user-select: none; /* Safari */
+       -khtml-user-select: none; /* Konqueror HTML */
+         -moz-user-select: none; /* Old versions of Firefox */
+          -ms-user-select: none; /* Internet Explorer/Edge */
+              user-select: none; /* Non-prefixed version, currently
+                                    supported by Chrome, Edge, Opera and Firefox */
+}
+
+.switch:hover, .switch.enabled:hover, .switch.disabled:hover {
+	background-color: var(--major-color);
+	color: var(--minor-color);
+	cursor: pointer;
+}
+
+.switch:active, .switch.enabled:active, .switch.disabled:active {
+	background-color: var(--minor-color);
+	color: var(--bg-color);
+	cursor: pointer;
+}
+
+.switch.enabled {
+	background-color: var(--major-color);
+	color: var(--bg-color);
+}
+
+.switch.disabled {
+	background-color: var(--bg-minor);
+	color: var(--minor-color);
+}
+
+
+
+a, a:visited {
+	color: var(--minor-color);
+	text-decoration: underline;
+
+	transition: color 0.1s ease-in-out;
+}
+
+a:hover, a:active {
+	color: var(--major-color);
+}
+
+.header {
+	display: flex;
+	flex-flow: row;
+	align-items: center;
+	justify-content: space-between;
+
+	padding: 10px;
+	margin-bottom: 10px;
+}
+
+
+.title_box {
+	display: flex;
+	flex-flow: column;
+	gap: 5px;
+}
+
+.title_box .title {
+	color: var(--major-color);
+	font-size: 32px;
+}
+
+.page {
+	display: flex;
+	flex-flow: column;
+	align-items: center;
+}
+
+.minefield_box {
+	flex-grow: 0;
+	display: flex;
+	flex-flow: column;
+	gap: 10px;
+}
+
+#minefield_config {
+	display: flex;
+	flex-flow: row;
+	align-items: center;
+	justify-content: center;
+	gap: 5px;
+}
+
+.size_config {
+	display: flex;
+	flex-flow: row;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+}
+
+.config_entry {
+	display: flex;
+	flex-flow: column;
+	align-items: center;
+}
+
+.config_name {
+	font-size: 18px;
+}
+
+.config_input {
+	text-align: center;
+}
+
+
+#minefield {
+	border-collapse: collapse;
+
+	background-color: var(--minefield-bg);
+	padding: 5px;
+	border-radius: 5px;
+	width: fit-content;
+}
+
+.header_tile {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	width: 28px;
+	height: 28px;
+
+	margin: 0;
+	padding: 0;
+
+	border: solid;
+	border-width: 1px;
+	border-color: var(--bg-color);
+	border-radius: 3px;
+
+	text-align: center;
+	vertical-align: middle;
+	line-height: 28px;
+
+	font-size: 20px;
+	font-family: "Ubuntu Mono", monospace;
+
+	color: var(--line-name);
+	background-color: var(--header-tile);
+
+	transition: color 0.05s ease-in-out;
+}
+
+.header_tile.highlighted {
+	color: var(--highlighted-line-name);
+}
+
+.tile_line {
+	display: flex;
+	flex-flow: row;
+	margin: 0;
+	padding: 0;
+}
+
+.tile {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	width: 28px;
+	height: 28px;
+
+	margin: 0;
+	padding: 0;
+
+	border: solid;
+	border-width: 1px;
+	border-color: var(--bg-color);
+	border-radius: 3px;
+
+	text-align: center;
+	vertical-align: middle;
+	line-height: 28px;
+
+	font-size: 26px;
+	font-family: "Ubuntu Mono", monospace;
+
+	transition: background-color 0.05s ease-in-out;
+	
+	-webkit-touch-callout: none; /* iOS Safari */
+      -webkit-user-select: none; /* Safari */
+       -khtml-user-select: none; /* Konqueror HTML */
+         -moz-user-select: none; /* Old versions of Firefox */
+          -ms-user-select: none; /* Internet Explorer/Edge */
+              user-select: none; /* Non-prefixed version, currently
+                                    supported by Chrome, Edge, Opera and Firefox */
+}
+
+.tile img {
+	max-width: 26px;
+	max-height: 26px;
+}
+
+.tile.open {
+	background-color: var(--open-tile);
+}
+
+.tile.open.highlighted {
+	background-color: var(--open-tile-highlighted);
+}
+
+.tile.closed {
+	background-color: var(--close-tile);
+}
+
+.tile.closed.highlighted {
+	background-color: var(--close-tile-highlighted);
+}
+
+.tile.open.mines1 {
+	color: var(--mines1);
+}
+
+.tile.open.mines2 {
+	color: var(--mines2);
+}
+
+.tile.open.mines3 {
+	color: var(--mines3);
+}
+
+.tile.open.mines4 {
+	color: var(--mines4);
+}
+
+.tile.open.mines5 {
+	color: var(--mines5);
+}
+
+.tile.open.mines6 {
+	color: var(--mines6);
+}
+
+.tile.open.mines7 {
+	color: var(--mines7);
+}
+
+.tile.open.mines8 {
+	color: var(--mines8);
+}
+
+.disassembly {
+	flex-grow: 1;
+}

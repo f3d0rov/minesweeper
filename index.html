@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!-- Icons from https://www.svgrepo.com/collection/dazzle-line-icons/1-->
+		<title> Minesweeper, technically </title>
+		<link rel="stylesheet" type="text/css" href="style.css" />
+
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Ubuntu+Sans:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+	</head>
+	<body>
+		<script src="minesweeper.js"></script>
+		<script src="ui.js"></script>
+		<div class = "header">
+			<div class = "title_box">
+				<div class = "title"> Minesweeper, technically </div>
+				<div class = "subtitle"> Deconstruction of the classic puzzle game into basic mathematical terms </div>
+			</div>
+			<div class = "author"> by <a href="https://github.com/f3d0rov">f3d0rov</a></div>
+		</div>
+		<div class = "page">
+			<div class = "minefield_box">
+				<div id = "minefield_config">
+					<div class = "size_config">
+						<div class = "config_entry">
+							<div class = "config_name"> width </div>
+							<input class = "config_input" id = "minefield_width" inputmode="numeric" value="30"/>
+						</div>
+						<div class = "config_entry">
+							<div class = "config_name"> height </div>
+							<input class = "config_input" id = "minefield_height" inputmode="numeric" value="16"/>
+						</div>					
+						<div class = "config_entry">
+							<div class = "config_name"> mines </div>
+							<input class = "config_input" id = "minefield_mines" inputmode="numeric" value="90"/>
+						</div>
+					</div>
+					<div class = "field_buttons">
+						<div class = "button" id = "generate"> Regenerate </div>
+						<div class = "switch" id = "showMines"> Show mines </div>
+					</div>
+				</div>
+				<div id = "minefield">
+					<!--
+						<div class = "header_tile"> AA </div>
+						<div class = "tile_line">
+							<div class = "header_tile">11</div>
+							<div class = "tile closed"></div>
+							<div class = "tile closed"><img src="res/flag.svg"></div>
+							<div class = "tile open"><img src="res/mine.svg"></div>
+							<div class = "tile open mines1">1</div>
+							<div class = "tile open mines2">2</div>
+							<div class = "tile open mines3">3</div>
+							<div class = "tile open mines4">4</div>
+							<div class = "tile open mines5">5</div>
+							<div class = "tile open mines6">6</div>
+							<div class = "tile open mines7">7</div>
+							<div class = "tile open mines8">8</div>
+						</div>
+					-->
+				</div>
+
+				<div id = "templates" style="display: none;">
+				</div>
+
+			</div>
+			<div class = "disassembly"></div>
+		</div>
+	</body>
+</html>
