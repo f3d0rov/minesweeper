@@ -254,6 +254,7 @@ class HeaderLine {
 class Minefield {
 	constructor (generator) {
 		this.elem = document.getElementById ("minefield");
+		this.elem.addEventListener ('contextmenu', (ev) => { ev.preventDefault(); });
 
 		this.widthInput = new IntInput ("minefield_width");
 		this.heightInput = new IntInput ("minefield_height");

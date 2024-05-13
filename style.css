@@ -12,9 +12,12 @@
 
 	--open-tile:             #282b31;
 	--open-tile-highlighted: #3c4965;
+	--open-tile-shadow:      black;
+
 	--close-tile:             #57585b;
 	--close-tile-highlighted: #697aae;
 	--closed-tile-active:     #839eef;	
+	--closed-tile-shadow:     #1c1c1c;
 
 	--line-name: #535353;
 	--highlighted-line-name: var(--minor-color);
@@ -302,6 +305,7 @@ a:hover, a:active {
 
 	font-size: 26px;
 	font-family: "Ubuntu Mono", monospace;
+	text-shadow: 0px 0px 2px var(--open-tile-shadow);
 
 	transition: background-color 0.08s ease-in-out;
 	
@@ -317,6 +321,11 @@ a:hover, a:active {
 .tile img {
 	max-width: 26px;
 	max-height: 26px;
+	filter: drop-shadow(0px 0px 2px var(--open-tile-shadow));
+}
+
+.tile.closed img {
+	filter: drop-shadow(0px 0px 2px var(--closed-tile-shadow));
 }
 
 .tile.open {

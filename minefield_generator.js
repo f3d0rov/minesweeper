@@ -31,14 +31,14 @@ class BasicMinefieldGenerator {
 		this.width = minefieldGenData.width;
 		this.height = minefieldGenData.height;
 		this.mines = minefieldGenData.mines;
-		this.click = {x: minefieldGenData.x, y: minefieldGenData.y};
+		this.click = {x: minefieldGenData.clickX, y: minefieldGenData.clickY};
 		this.mineCoords = null;
 		this.generate ();
 	}
 
 	generate () {
 		let codes = this.codeList();
-		codes.splice (this.codeFor (this.click.x, this.click.y), 1);
+		codes.splice (codes.indexOf (this.codeFor (this.click.x, this.click.y)), 1);
 		if (codes.length < this.mines) throw new TooMuchMinesException();
 
 		this.mineCoords = new Set();
