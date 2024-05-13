@@ -29,9 +29,17 @@ class Tile {
 		this.elem.classList.add (this.tileClass, this.closedTileClass);
 		this.elem.addEventListener ('mouseenter', (ev) => { this.mouseEnter (ev); });
 		this.elem.addEventListener ('mouseleave', (ev) => { this.mouseLeave (ev); });
-		this.elem.addEventListener ('click', (ev) => { this.click (ev); });
-		this.elem.addEventListener ('contextmenu', (ev) => { this.flag (ev); ev.preventDefault(); });
-		
+		this.elem.addEventListener ('mouseup', (ev) => { this.mouseup (ev); });
+		this.elem.addEventListener ('contextmenu', (ev) => { ev.preventDefault(); });
+	}
+
+	mouseup (ev) {
+		if (ev.button == 0) {
+			this.click (ev);
+		} else if (ev.button == 2) {
+			this.flag (ev);
+		}
+		ev.preventDefault();
 	}
 
 	mouseEnter (ev) {

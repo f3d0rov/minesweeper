@@ -14,6 +14,7 @@
 	--open-tile-highlighted: #3c4965;
 	--close-tile:             #57585b;
 	--close-tile-highlighted: #697aae;
+	--closed-tile-active:     #839eef;	
 
 	--line-name: #535353;
 	--highlighted-line-name: var(--minor-color);
@@ -302,7 +303,7 @@ a:hover, a:active {
 	font-size: 26px;
 	font-family: "Ubuntu Mono", monospace;
 
-	transition: background-color 0.02s ease-in-out;
+	transition: background-color 0.08s ease-in-out;
 	
 	-webkit-touch-callout: none; /* iOS Safari */
       -webkit-user-select: none; /* Safari */
@@ -332,6 +333,10 @@ a:hover, a:active {
 
 .tile.closed.highlighted {
 	background-color: var(--close-tile-highlighted);
+}
+
+.tile.closed:active, .tile.closed.highlighted:active {
+	background-color: var(--closed-tile-active);
 }
 
 .tile.open.mines1 {
