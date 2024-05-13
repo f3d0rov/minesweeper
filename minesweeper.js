@@ -9,12 +9,16 @@ class Tile {
 		this.mineColorClass = "mines";
 		this.highlightClass = "highlighted";
 		this.flagImg = "res/flag.svg";
+		this.mineImg = "res/mine.svg";
 
 		this.x = x;
 		this.y = y;
 		this.parent = parent;
+
 		this.isOpen = false;
 		this.isFlagged = false;
+		this.isMined = false;
+		this.number = 0;
 
 		this.createElem();
 		this.parent.elem.appendChild (this.elem);
@@ -41,16 +45,34 @@ class Tile {
 	}
 
 	click (ev) {
+		if (this.isOpen == false)
+			this.open();
+		else if (this.isMined == false)
+			this.parent.tileSurroundRevealCallback (this);
+	}
+
+	open () {
 		if (this.isOpen || this.isFlagged) return;
 		this.isOpen = true;
-		this.innerHTML = "";
 
+		this.innerHTML = "";
 		this.elem.classList.remove (this.closedTileClass);
 		this.elem.classList.add (this.openTileClass);
-		let rand = Math.floor (Math.random () * 1000000) % 9;
-		if (rand != 0)
-			this.elem.innerHTML = '' + rand;
-			this.elem.classList.add (this.mineColorClass + rand);
+
+		this.parent.tileOpenedCallback (this);
+
+		if (this.isMined) {
+			this.genMine();
+			// mineOpenedCallback();
+		} else {
+			this.showNumber ();
+		}
+	}
+
+	showNumber () {
+		if (this.number == 0) return;
+		this.elem.innerHTML = '' + this.number;
+		this.elem.classList.add (this.mineColorClass + this.number);
 	}
 
 	flag (ev) {
@@ -69,7 +91,22 @@ class Tile {
 		flag.setAttribute ('src', this.flagImg);
 		this.elem.appendChild (flag);
 	}
+
+	genMine () {
+		let mine = document.createElement ('img');
+		mine.setAttribute ('src', this.mineImg);
+		this.elem.appendChild (mine);
+	}
+
+	setMine () {
+		this.isMined = true;
+	}
+
+	inc () {
+		this.number += 1;
+	}
 }
+
 
 class HeaderTile {
 	constructor (parent, name) {
@@ -127,6 +164,30 @@ class Line {
 		this.headerTile.dim();
 		this.parent.mouseLeaveCallback (x, this.y);
 	}
+
+	setMine (x) {
+		this.tiles [x].setMine();
+	}
+
+	isFlagged (x) {
+		return this.tiles [x].isFlagged;
+	}
+
+	tileOpenedCallback (tile) {
+		this.parent.tileOpenedCallback (tile);
+	}
+
+	tileSurroundRevealCallback (tile) {
+		this.parent.tileSurroundRevealCallback (tile);
+	}
+
+	inc (x) {
+		this.tiles [x].inc();
+	}
+
+	open (x) {
+		this.tiles [x].open();
+	}
 }
 
 class HeaderLine {
@@ -183,7 +244,7 @@ class HeaderLine {
 
 
 class Minefield {
-	constructor () {
+	constructor (generator) {
 		this.elem = document.getElementById ("minefield");
 
 		this.widthInput = new IntInput ("minefield_width");
@@ -191,10 +252,19 @@ class Minefield {
 		this.minesInput = new IntInput ("minefield_mines");
 
 
-		this.showMinesSwitch = new Switch ("showMines", (state) => { this.displayMines (state); });
+		this.editModeSwitch = new Switch ("editMode", (state) => { });
 		this.generateButton = new Button ("generate", () => {this.generate(); });
 
 		this.lines = [];
+
+		this.minefieldGen = generator;
+
+		this.currentGame = {
+			width: 0,
+			height: 0,
+			mines: 0,
+			generated: false
+		};
 
 		this.generate ();
 	}
@@ -218,6 +288,13 @@ class Minefield {
 			let line = new Line (this, width, i);
 			this.lines.push (line);
 		}
+
+		this.currentGame = {
+			width: width,
+			height: height,
+			mines: mines,
+			generated: false
+		};
 	}
 
 	clear () {
@@ -238,13 +315,110 @@ class Minefield {
 	mouseLeaveCallback (x, y) {
 		this.headerLine.dim (x);
 	}
+
+	tileOpenedCallback (tile) {
+		if (this.currentGame.generated == false) {
+			this.firstOpen (tile.x, tile.y);
+			this.currentGame.generated = true;
+		}
+
+		if (tile.number == 0 && tile.isMined == false) {
+			for (let i of this.surround (tile.x, tile.y)) {
+				this.open (i.x, i.y);
+			}
+		}
+	}
+
+	firstOpen (x, y) {
+		let minesData = this.generateMineData (x, y);
+		this.placeMines (minesData);
+	}
+
+	generateMineData (x, y) {
+		let minefieldGenData = new MinefieldGenerationData();
+		minefieldGenData.width = this.currentGame.width;
+		minefieldGenData.height = this.currentGame.height;
+		minefieldGenData.mines = this.currentGame.mines;
+		minefieldGenData.clickX = x;
+		minefieldGenData.clickY = y;
+
+		return new this.minefieldGen (minefieldGenData);
+	}
+
+	placeMines (minesData) {
+		let count = 0;
+		for (let j = 0; j < this.currentGame.height; j++) {
+			for (let i = 0; i < this.currentGame.width; i++) {
+				if (minesData.isMineAt (i, j)) {
+					this.setMine (i, j);
+					count += 1;
+				}
+			}
+		}
+		console.log ("Total mines placed: " + count);
+	}
+	
+	setMine (x, y) {
+		this.lines [y].setMine (x);
+		for (let i of this.surround (x, y)) {
+			this.inc (i.x, i.y);
+		}
+	}
+
+	inc (x, y) {
+		if (this.isValid (x, y))
+			this.lines [y].inc (x);
+	}
+
+	open (x, y) {
+		if (this.isValid (x, y))
+			this.lines [y].open (x);
+	}
+
+	isValid (x, y) {
+		return !(x < 0 || x >= this.currentGame.width || y < 0 || y >= this.currentGame.height);
+	}
+
+	surround (X, Y) {
+		return [
+			{x: X + 1, y: Y + 1},
+			{x: X + 1, y: Y    },
+			{x: X + 1, y: Y - 1},
+			{x: X    , y: Y + 1},
+			{x: X    , y: Y - 1},
+			{x: X - 1, y: Y + 1},
+			{x: X - 1, y: Y    },
+			{x: X - 1, y: Y - 1}
+		];
+	}
+
+	tileSurroundRevealCallback (tile) {
+		if (this.flagsAround (tile) == tile.number) {
+			for (let i of this.surround (tile.x, tile.y)) {
+				this.open (i.x, i.y);
+			}
+		}
+	}
+
+	flagsAround (tile) {
+		let totalFlags = 0;
+		for (let i of this.surround (tile.x, tile.y)) {
+			totalFlags += this.flagsAt (i.x, i.y);
+		}
+		return totalFlags;
+	}
+
+	flagsAt (x, y) {
+		if (this.isValid (x, y))
+			return this.lines [y].isFlagged (x) ? 1 : 0;
+		else
+			return 0;
+	}
 }
 
 
 function setupMinefield () {
-	var minefield = new Minefield ();
-
-	var displayMinesSwitch = new Switch ("showMines");
+	var minefield = new Minefield (BasicMinefieldGenerator);
 }
 
 window.addEventListener ('load', () => { setupMinefield (); });

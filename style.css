@@ -196,6 +196,7 @@ a:hover, a:active {
 	display: flex;
 	flex-flow: column;
 	gap: 10px;
+	align-items: center;
 }
 
 #minefield_config {
@@ -301,7 +302,7 @@ a:hover, a:active {
 	font-size: 26px;
 	font-family: "Ubuntu Mono", monospace;
 
-	transition: background-color 0.05s ease-in-out;
+	transition: background-color 0.02s ease-in-out;
 	
 	-webkit-touch-callout: none; /* iOS Safari */
       -webkit-user-select: none; /* Safari */

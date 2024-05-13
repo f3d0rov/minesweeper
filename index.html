@@ -11,8 +11,9 @@
 		<link href="https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
 	</head>
 	<body>
-		<script src="minesweeper.js"></script>
 		<script src="ui.js"></script>
+		<script src="minefield_generator.js"></script>
+		<script src="minesweeper.js"></script>
 		<div class = "header">
 			<div class = "title_box">
 				<div class = "title"> Minesweeper, technically </div>
@@ -38,8 +39,8 @@
 						</div>
 					</div>
 					<div class = "field_buttons">
-						<div class = "button" id = "generate"> Regenerate </div>
-						<div class = "switch" id = "showMines"> Show mines </div>
+						<div class = "button" id = "generate"> Reset </div>
+						<div class = "switch" id = "editMode"> Edit mode </div>
 					</div>
 				</div>
 				<div id = "minefield">
