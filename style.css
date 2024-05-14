@@ -32,6 +32,14 @@
 	--mines8: #fc11d9;
 }
 
+.hidden {
+	display: none !important;
+}
+
+.transparent {
+	opacity: 0;
+}
+
 body {
 	color: var(--minor-color);
 	background-color: var(--bg-color);
@@ -203,12 +211,18 @@ a:hover, a:active {
 	align-items: center;
 }
 
+.minefield_header {
+	height: 70px;
+}
+
 #minefield_config {
 	display: flex;
 	flex-flow: row;
 	align-items: center;
 	justify-content: center;
 	gap: 5px;
+
+	transition: opacity 0.2s ease-in-out;
 }
 
 .size_config {
@@ -231,6 +245,55 @@ a:hover, a:active {
 
 .config_input {
 	text-align: center;
+}
+
+#minefield_stats {
+	display: flex;
+	flex-flow: row;
+	align-items: center;
+	justify-content: center;
+	gap: 5px;
+
+	transition: opacity 0.2s ease-in-out;
+}
+
+.game_state {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	
+	background-color: var(--bg-minor);
+	padding: 2px;
+	border-radius: 4px;
+}
+
+.game_state img {
+	width: 55px;
+	height: 55px;
+}
+
+.game_stat {
+	display: flex;
+	flex-flow: column;
+	align-items: center;
+}
+
+.game_stat_name {
+	font-size: 18px;
+}
+
+.game_stat_value {
+	width: fit-content;
+	min-width: 60px;
+	padding: 2px;
+	border-radius: 2px;
+
+	font-family: "Ubuntu Mono", monospace;
+	font-size: 28px;
+	text-align: center;
+
+	background-color: var(--bg-minor);
+	color: var(--minor-color);
 }
 
 

@@ -18,7 +18,7 @@ class MinefieldGenerationData {
 
 class TooMuchMinesException {
 	constructor () {}
-};
+}
 
 class AbstractGeneratedMinefieldMap {
 	constructor (minefieldGenData) {} // Initializes object, generates map

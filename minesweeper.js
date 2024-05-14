@@ -88,9 +88,11 @@ class Tile {
 		if (this.isFlagged) {
 			this.isFlagged = false;
 			this.elem.innerHTML = "";
+			this.parent.unflagCallback();
 		} else {
 			this.isFlagged = true;
 			this.genFlag();
+			this.parent.flagCallback();
 		}
 	}
 
@@ -196,6 +198,14 @@ class Line {
 	open (x) {
 		this.tiles [x].open();
 	}
+
+	flagCallback () {
+		this.parent.flagCallback();
+	}
+
+	unflagCallback () {
+		this.parent.unflagCallback();
+	}
 }
 
 class HeaderLine {
@@ -251,18 +261,47 @@ class HeaderLine {
 }
 
 
+class Emoticon {
+	constructor () {
+		this.id = "emoticon";
+		this.aliveImg = "res/alive.svg";
+		this.deadImg = "res/dead.svg";
+		this.elem = document.getElementById (this.id);
+	}
+
+	resetGame () {
+		this.elem.setAttribute ("src", this.aliveImg);
+	}
+
+	fail () {
+		this.elem.setAttribute ("src", this.deadImg);
+	}
+}
+
+
 class Minefield {
 	constructor (generator) {
 		this.elem = document.getElementById ("minefield");
 		this.elem.addEventListener ('contextmenu', (ev) => { ev.preventDefault(); });
+		this.elem.addEventListener ('mouseenter', () => { this.mouseEnter(); });
+		this.elem.addEventListener ('mouseleave', () => { this.mouseLeave(); });
 
 		this.widthInput = new IntInput ("minefield_width");
 		this.heightInput = new IntInput ("minefield_height");
 		this.minesInput = new IntInput ("minefield_mines");
 
+		this.hiddenClass = "hidden";
+		this.transparentClass = "transparent";
+		this.transparencyTime = 200; // ms
 
 		this.editModeSwitch = new Switch ("editMode", (state) => { });
 		this.generateButton = new Button ("generate", () => {this.generate(); });
+
+		this.configLayer = document.getElementById ("minefield_config");
+		this.gameLayer = document.getElementById ("minefield_stats");
+		this.minesLeft = document.getElementById ("mines_left");
+
+		this.emoticon = new Emoticon();
 
 		this.lines = [];
 
@@ -276,6 +315,51 @@ class Minefield {
 		};
 
 		this.generate ();
+	}
+
+	mouseEnter () {
+		this.showGameStats();
+	}
+
+	mouseLeave () {
+		this.showGameConfig();
+	}
+
+	showGameStats () {
+		let unique = Math.random();
+		this.statsSwitchControl = unique;
+
+		this.configLayer.classList.add (this.transparentClass);
+		setTimeout (() => {
+			if (this.statsSwitchControl != unique) return;
+
+			this.configLayer.classList.add (this.hiddenClass);
+			this.gameLayer.classList.remove (this.hiddenClass);
+
+			setTimeout (() => {
+				if (this.statsSwitchControl != unique) return;
+
+				this.gameLayer.classList.remove (this.transparentClass);
+			}, this.transparencyTime / 2);
+		}, this.transparencyTime);	
+	}
+
+	showGameConfig () {
+		let unique = Math.random();
+		this.statsSwitchControl = unique;
+
+		this.gameLayer.classList.add (this.transparentClass);
+		setTimeout (() => {
+			if (this.statsSwitchControl != unique) return;
+
+			this.gameLayer.classList.add (this.hiddenClass);
+			this.configLayer.classList.remove (this.hiddenClass);
+			setTimeout (() => {
+				if (this.statsSwitchControl != unique) return;
+
+				this.configLayer.classList.remove (this.transparentClass);
+			}, this.transparencyTime / 2);
+		}, this.transparencyTime);	
 	}
 
 	highlight (x, y, style) {}
@@ -302,8 +386,11 @@ class Minefield {
 			width: width,
 			height: height,
 			mines: mines,
+			minesLeft: mines,
 			generated: false
 		};
+		this.updateMinesLeft();
+		this.emoticon.resetGame();
 	}
 
 	clear () {
@@ -335,6 +422,12 @@ class Minefield {
 			for (let i of this.surround (tile.x, tile.y)) {
 				this.open (i.x, i.y);
 			}
+		}
+
+		if (tile.isMined) {
+			this.emoticon.fail();
+			this.currentGame.minesLeft--;
+			this.updateMinesLeft();
 		}
 	}
 
@@ -422,6 +515,20 @@ class Minefield {
 			return this.lines [y].isFlagged (x) ? 1 : 0;
 		else
 			return 0;
+	}
+
+	updateMinesLeft () {
+		this.minesLeft.innerHTML = this.currentGame.minesLeft;
+	}
+	
+	flagCallback () {
+		this.currentGame.minesLeft--;
+		this.updateMinesLeft();
+	}
+
+	unflagCallback () {
+		this.currentGame.minesLeft++;
+		this.updateMinesLeft();
 	}
 }
 

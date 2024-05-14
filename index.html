@@ -23,7 +23,7 @@
 		</div>
 		<div class = "page">
 			<div class = "minefield_box">
-				<div id = "minefield_config">
+				<div id = "minefield_config" class = "minefield_header">
 					<div class = "size_config">
 						<div class = "config_entry">
 							<div class = "config_name"> width </div>
@@ -39,28 +39,20 @@
 						</div>
 					</div>
 					<div class = "field_buttons">
-						<div class = "button" id = "generate"> Reset </div>
-						<div class = "switch" id = "editMode"> Edit mode </div>
+						<div class = "button" id = "generate"> reset </div>
+						<div class = "switch" id = "editMode"> edit mode </div>
+					</div>
+				</div>
+				<div id = "minefield_stats" class = "minefield_header hidden">
+					<div class = "game_state">
+						<img src="res/alive.svg" id = "emoticon">
+					</div>
+					<div class = "game_stat">
+						<div class = "game_stat_name"> mines </div>
+						<div class = "game_stat_value" id = "mines_left"> 100 </div>
 					</div>
 				</div>
 				<div id = "minefield">
-					<!--
-						<div class = "header_tile"> AA </div>
-						<div class = "tile_line">
-							<div class = "header_tile">11</div>
-							<div class = "tile closed"></div>
-							<div class = "tile closed"><img src="res/flag.svg"></div>
-							<div class = "tile open"><img src="res/mine.svg"></div>
-							<div class = "tile open mines1">1</div>
-							<div class = "tile open mines2">2</div>
-							<div class = "tile open mines3">3</div>
-							<div class = "tile open mines4">4</div>
-							<div class = "tile open mines5">5</div>
-							<div class = "tile open mines6">6</div>
-							<div class = "tile open mines7">7</div>
-							<div class = "tile open mines8">8</div>
-						</div>
-					-->
 				</div>
 
 				<div id = "templates" style="display: none;">
