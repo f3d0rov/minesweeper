@@ -1,8 +1,23 @@
 
 
+function getNameForColumn (index, len) {
+	// Essentialy convert index to a base-26 number with A corresponding to 0
+	let charLen = Math.ceil (Math.log (len) / Math.log (26));
+	let res = "";
+	let c = index;
+	let top = Math.ceil (Math.log (c) / Math.log (26));
+	for (let i = top; i >= 0; i--) {
+		let code = Math.floor (c / Math.pow (26, i));
+		c = c % Math.pow (26, i);
+		if (i == top && code == 0) continue;
+		res += String.fromCharCode ('A'.charCodeAt(0) + code);
+	}
+	return res.padStart (charLen, 'A');
+}
+
 
 class Tile {
-	constructor (parent, x, y) {
+	constructor (parent, x, y, w) {
 		this.tileClass = "tile";
 		this.openTileClass = "open";
 		this.closedTileClass = "closed";
@@ -13,12 +28,16 @@ class Tile {
 
 		this.x = x;
 		this.y = y;
+		this.myName = getNameForColumn (x, w) + y;
 		this.parent = parent;
 
 		this.isOpen = false;
 		this.isFlagged = false;
 		this.isMined = false;
 		this.number = 0;
+
+		this.variables = [];
+		this.equation = null;
 
 		this.createElem();
 		this.parent.elem.appendChild (this.elem);
@@ -45,11 +64,27 @@ class Tile {
 	mouseEnter (ev) {
 		this.elem.classList.add (this.highlightClass);
 		this.parent.mouseEnterCallback (this.x);
+		for (let i of this.variables) {
+			i.highlight();
+		}
+
+		if (this.equation) {
+			this.equation.highlight();
+			this.equation.scrollTo();
+		}
 	}
 
 	mouseLeave (ev) {
 		this.elem.classList.remove (this.highlightClass);
 		this.parent.mouseLeaveCallback (this.x);
+		
+		for (let i of this.variables) {
+			i.dim();
+		}
+
+		if (this.equation) {
+			this.equation.dim();
+		}
 	}
 
 	click (ev) {
@@ -71,9 +106,14 @@ class Tile {
 
 		if (this.isMined) {
 			this.genMine();
-			// mineOpenedCallback();
 		} else {
-			this.showNumber ();
+			this.showNumber();
+			for (let i of this.variables) {
+				i.remove();
+			}
+			this.variables = [];
+			this.mouseLeave();
+		
 		}
 	}
 
@@ -114,6 +154,18 @@ class Tile {
 
 	inc () {
 		this.number += 1;
+	}
+
+	name () {
+		return this.myName;
+	}
+
+	addVariable (v) {
+		this.variables.push (v);
+	}
+
+	setEquation (eq) {
+		this.equation = eq;
 	}
 }
 
@@ -158,7 +210,7 @@ class Line {
 		this.tiles = [];
 
 		for (let i = 0; i < width; i++) {
-			let tile = new Tile (this, i, y);
+			let tile = new Tile (this, i, y, width);
 			this.tiles.push (tile);
 		}
 
@@ -206,6 +258,10 @@ class Line {
 	unflagCallback () {
 		this.parent.unflagCallback();
 	}
+
+	at (x) {
+		return this.tiles [x];
+	}
 }
 
 class HeaderLine {
@@ -223,7 +279,7 @@ class HeaderLine {
 		this.headerTiles = [];
 
 		for (let i = 0; i < width; i++) {
-			let tile = new HeaderTile (this, this.getNameForColumn (i, width));
+			let tile = new HeaderTile (this, getNameForColumn (i, width));
 			this.headerTiles.push (tile);
 		}
 
@@ -234,21 +290,6 @@ class HeaderLine {
 		let tile = document.createElement ("div");
 		tile.classList.add (this.tileClass);
 		return tile;
-	}
-
-	getNameForColumn (index, len) {
-		// Essentialy convert index to a base-26 number with A corresponding to 0
-		let charLen = Math.ceil (Math.log (len) / Math.log (26));
-		let res = "";
-		let c = index;
-		let top = Math.ceil (Math.log (c) / Math.log (26));
-		for (let i = top; i >= 0; i--) {
-			let code = Math.floor (c / Math.pow (26, i));
-			c = c % Math.pow (26, i);
-			if (i == top && code == 0) continue;
-			res += String.fromCharCode ('A'.charCodeAt(0) + code);
-		}
-		return res.padStart (charLen, 'A');
 	}
 
 	highlight (x) {
@@ -279,6 +320,166 @@ class Emoticon {
 }
 
 
+class Variable {
+	constructor (parent, tile) {
+		this.parent = parent;
+		this.tile = tile;
+		this.elem = document.createElement ('span');
+		this.className = 'variable';
+		this.highlightClass = 'highlight';
+
+		this.elem.classList.add (this.className);
+		this.elem.innerHTML = tile.name();
+		this.parent.elem.appendChild (this.elem);
+		
+		this.tile.addVariable (this);
+
+		this.setupEvents();
+	}
+
+	setupEvents () {
+		this.elem.addEventListener ('mouseenter', (ev) => { this.mouseEnter (ev); });
+		this.elem.addEventListener ('mouseleave', (ev) => { this.mouseLeave (ev); });
+		this.elem.addEventListener ('mouseup', (ev) => { this.mouseup (ev); });
+		this.elem.addEventListener ('contextmenu', (ev) => { ev.preventDefault(); });
+	}
+
+	mouseEnter (ev) {
+		this.tile.mouseEnter ();
+	}
+
+	mouseLeave (ev) {
+		this.tile.mouseLeave ();
+	}
+
+	mouseup (ev) {
+		this.tile.mouseup (ev);
+	}
+
+	highlight () {
+		this.elem.classList.add (this.highlightClass);
+	}
+
+	dim () {
+		this.elem.classList.remove (this.highlightClass);
+	}
+
+	remove () {
+		this.elem.parentElement.removeChild (this.elem);
+		this.parent.removeVariable (this);
+	}
+}
+
+class Equation {
+	constructor (parent, tile, surround) {
+		this.parent = parent;
+		this.className = "equation";
+		this.minesClass = "mines";
+		this.operatorClass = "operator";
+		this.highlightClass = "highlight";
+		this.elem = document.createElement ('div');
+		this.elem.classList.add (this.className);
+		this.parent.container.appendChild (this.elem);
+
+		this.variables = [];
+
+		let isNotFirst = false;
+		for (let i of surround) {
+			if (i.isOpen && !i.isMined) continue;
+			if (isNotFirst) this.addOperator ("+");
+			this.variables.push (new Variable (this, i));
+			isNotFirst = true;
+		}
+		this.addOperator ("=");
+		this.addResult (tile.number);
+
+		this.tile = tile;
+		this.tile.setEquation (this);
+
+		this.setupEvents ();
+	}
+
+	setupEvents () {
+		this.elem.addEventListener ('mouseenter', (ev) => { this.mouseEnter (ev); });
+		this.elem.addEventListener ('mouseleave', (ev) => { this.mouseLeave (ev); });
+	}
+
+	mouseEnter () {
+		this.tile.mouseEnter();
+	}
+
+	mouseLeave () {
+		this.tile.mouseLeave();
+	}
+
+	highlight () {
+		this.elem.classList.add (this.highlightClass);
+	}
+
+	dim () {
+		this.elem.classList.remove (this.highlightClass);
+	}
+
+	scrollTo () {
+		this.elem.scrollIntoView ({block: "nearest"});
+	}
+
+	addResult (total) {
+		let result = document.createElement ("span");
+		result.classList.add (this.minesClass + total);
+		result.innerHTML = '' + total;
+		this.elem.appendChild (result);
+	}
+
+	addOperator (op) {
+		let operElem = document.createElement ('span');
+		operElem.innerHTML = op;
+		operElem.classList.add (this.operatorClass);
+		this.elem.appendChild (operElem);
+	}
+
+	removeVariable (v) {
+		this.variables.splice (this.variables.indexOf (v), 1);
+		let isPrevOp = true;
+		let prev = null;
+		for (let i of this.elem.children) {
+			if (i.classList.contains (this.operatorClass)) {
+				if (isPrevOp) {
+					if (i.innerHTML == '=') {
+						if (prev) this.elem.removeChild (prev);
+					} else {
+						this.elem.removeChild (i);
+					}
+					break;
+				}
+				isPrevOp = true;
+				prev = i;
+			} else {
+				isPrevOp = false;
+			}
+		}
+	}
+
+}
+
+class Disassembly {
+	constructor () {
+		this.id = "disassembly_equations";
+		this.container = document.getElementById (this.id);
+		this.tiles = [];
+		this.equations = [];
+	}
+
+	clear () {
+		this.container.innerHTML = "";
+	}
+
+	addOpenTile (tile, surround) {
+		this.equations.push (new Equation (this, tile, surround));
+	}
+}
+
+
 class Minefield {
 	constructor (generator) {
 		this.elem = document.getElementById ("minefield");
@@ -302,6 +503,7 @@ class Minefield {
 		this.minesLeft = document.getElementById ("mines_left");
 
 		this.emoticon = new Emoticon();
+		this.disassembly = new Disassembly();
 
 		this.lines = [];
 
@@ -391,18 +593,15 @@ class Minefield {
 		};
 		this.updateMinesLeft();
 		this.emoticon.resetGame();
+		this.disassembly.clear();
 	}
 
 	clear () {
 		this.lines = [];
 		this.elem.innerHTML = "";
 	}
-	
-	open (x, y) {}
-	markMine (x, y) {}
 
 	displayMines (doShow) {}
-
 
 	mouseEnterCallback (x, y) {
 		this.headerLine.highlight (x);
@@ -422,6 +621,12 @@ class Minefield {
 			for (let i of this.surround (tile.x, tile.y)) {
 				this.open (i.x, i.y);
 			}
+		} else if (tile.number != 0 && tile.isMined == false) {
+			let surround = [];
+			for (let i of this.surround (tile.x, tile.y)) {
+				if (this.isValid (i.x, i.y)) surround.push (this.getTile (i));
+			}
+			this.disassembly.addOpenTile (tile, surround);
 		}
 
 		if (tile.isMined) {
@@ -429,6 +634,10 @@ class Minefield {
 			this.currentGame.minesLeft--;
 			this.updateMinesLeft();
 		}
+	}
+
+	getTile (xy) {
+		return this.lines [xy.y].at (xy.x);
 	}
 
 	firstOpen (x, y) {
@@ -483,11 +692,11 @@ class Minefield {
 
 	surround (X, Y) {
 		return [
-			{x: X + 1, y: Y + 1},
-			{x: X + 1, y: Y    },
-			{x: X + 1, y: Y - 1},
-			{x: X    , y: Y + 1},
 			{x: X    , y: Y - 1},
+			{x: X + 1, y: Y - 1},
+			{x: X + 1, y: Y    },
+			{x: X + 1, y: Y + 1},
+			{x: X    , y: Y + 1},
 			{x: X - 1, y: Y + 1},
 			{x: X - 1, y: Y    },
 			{x: X - 1, y: Y - 1}

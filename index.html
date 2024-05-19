@@ -27,7 +27,7 @@
 					<div class = "size_config">
 						<div class = "config_entry">
 							<div class = "config_name"> width </div>
-							<input class = "config_input" id = "minefield_width" inputmode="numeric" value="30"/>
+							<input class = "config_input" id = "minefield_width" inputmode="numeric" value="16"/>
 						</div>
 						<div class = "config_entry">
 							<div class = "config_name"> height </div>
@@ -35,7 +35,7 @@
 						</div>					
 						<div class = "config_entry">
 							<div class = "config_name"> mines </div>
-							<input class = "config_input" id = "minefield_mines" inputmode="numeric" value="90"/>
+							<input class = "config_input" id = "minefield_mines" inputmode="numeric" value="50"/>
 						</div>
 					</div>
 					<div class = "field_buttons">
@@ -54,12 +54,20 @@
 				</div>
 				<div id = "minefield">
 				</div>
-
-				<div id = "templates" style="display: none;">
-				</div>
-
 			</div>
-			<div class = "disassembly"></div>
+			<div class = "disassembly">
+				<div class = "disassembly_header">
+					<div class = "button disabled"> switch view </div>
+				</div>
+				<div class = "disassembly_body">
+					<div class = "eq_system">
+						<div class = "eq_system_join">
+						</div>
+						<div class = "eq_system_equations" id = "disassembly_equations">
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	</body>
 </html>

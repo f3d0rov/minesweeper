@@ -111,6 +111,12 @@ input.bad {
 	color: var(--bg-color);
 }
 
+.button.disabled:hover, .button.disabled:active {
+	background-color: var(--bg-minor);
+	color: var(--bg-color);
+	cursor: not-allowed;
+}
+
 
 .switch {
 	width: 300px;
@@ -199,8 +205,9 @@ a:hover, a:active {
 
 .page {
 	display: flex;
-	flex-flow: column;
-	align-items: center;
+	flex-flow: row;
+	align-items: start;
+	gap: 10px;
 }
 
 .minefield_box {
@@ -209,6 +216,7 @@ a:hover, a:active {
 	flex-flow: column;
 	gap: 10px;
 	align-items: center;
+	min-width: 550px;
 }
 
 .minefield_header {
@@ -411,38 +419,125 @@ a:hover, a:active {
 	background-color: var(--closed-tile-active);
 }
 
-.tile.open.mines1 {
+.mines1 {
 	color: var(--mines1);
 }
 
-.tile.open.mines2 {
+.mines2 {
 	color: var(--mines2);
 }
 
-.tile.open.mines3 {
+.mines3 {
 	color: var(--mines3);
 }
 
-.tile.open.mines4 {
+.mines4 {
 	color: var(--mines4);
 }
 
-.tile.open.mines5 {
+.mines5 {
 	color: var(--mines5);
 }
 
-.tile.open.mines6 {
+.mines6 {
 	color: var(--mines6);
 }
 
-.tile.open.mines7 {
+.mines7 {
 	color: var(--mines7);
 }
 
-.tile.open.mines8 {
+.mines8 {
 	color: var(--mines8);
 }
 
 .disassembly {
+	display: flex;
+	flex-flow: column;
 	flex-grow: 1;
+	width: 60%;
+	min-width: 300px;
+
+	font-family: "Ubuntu Sans", sans-serif;
+	gap: 10px;
+}
+
+.disassembly_header {
+	font-size: 22px;
+	display: flex;
+	flex-flow: row;
+	justify-content: right;
+}
+
+.disassembly_body {
+	font-family: "Ubuntu Mono", monospace;
+	font-size: 20px;
+	height: 75vh;
+	padding: 5px;
+	border-radius: 4px;
+	background-color: var(--bg-minor);
+	overflow-y: scroll;
+	scroll-behavior: smooth;
+}
+
+.eq_system {
+	display: flex;
+	flex-flow: row;
+	gap: 10px;
+}
+
+.eq_system_join {
+	background-color: var(--minor-color);
+	width: 2px;
+}
+
+.eq_system_equations {
+	display: flex;
+	flex-flow: column;
+	gap: 2px;
+}
+
+.equation {
+	display: flex;
+	width: fit-content;
+	align-items: center;
+	gap: 3px;
+	padding-left: 3px;
+	padding-right: 3px;
+	padding-top: 1px;
+	padding-bottom: 1px;
+	border-radius: 3px;
+
+	transition: background-color 0.1s ease-in-out;
+}
+
+.equation.highlight {
+	background-color: var(--bg-color);
+}
+
+.variable {
+	color: var(--minor-color);
+	border-radius: 2px;
+	padding-left: 2px;
+	padding-right: 2px;
+	transition: color 0.1s ease-in-out,
+				background-color 0.1s ease-in-out;
+				
+	-webkit-touch-callout: none; /* iOS Safari */
+      -webkit-user-select: none; /* Safari */
+       -khtml-user-select: none; /* Konqueror HTML */
+         -moz-user-select: none; /* Old versions of Firefox */
+          -ms-user-select: none; /* Internet Explorer/Edge */
+              user-select: none; /* Non-prefixed version, currently
+                                    supported by Chrome, Edge, Opera and Firefox */
+}
+
+.variable.highlight {
+	color: var(--bg-color);
+	background-color: var(--major-color);
+	cursor: pointer;
+}
+
+.sum {
+	font-size: 30px;
 }
