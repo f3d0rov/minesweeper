@@ -321,9 +321,10 @@ class Emoticon {
 
 
 class Variable {
-	constructor (parent, tile) {
+	constructor (parent, tile, mfield) {
 		this.parent = parent;
 		this.tile = tile;
+		this.minefield = mfield;
 		this.elem = document.createElement ('span');
 		this.className = 'variable';
 		this.highlightClass = 'highlight';
@@ -334,6 +335,7 @@ class Variable {
 		
 		this.tile.addVariable (this);
 
+		this.relatedBox = null;		
 		this.setupEvents();
 	}
 
@@ -346,10 +348,22 @@ class Variable {
 
 	mouseEnter (ev) {
 		this.tile.mouseEnter ();
+		let x = Math.max (this.elem.parentElement.getBoundingClientRect().left + 300, this.elem.parentElement.getBoundingClientRect().right + 10);
+		let y = this.elem.parentElement.getBoundingClientRect().top;
+		console.log (y);
+		this.relatedBox = new RelatedEquationsBox (this.parent.elem.parentElement.parentElement, this.minefield, this.tile, x, y);
 	}
 
 	mouseLeave (ev) {
 		this.tile.mouseLeave ();
+		this.destroyBox();
+	}
+
+	destroyBox () {
+		if (this.relatedBox) {
+			this.relatedBox.destroy();
+			this.relatedBox = null;
+		}
 	}
 
 	mouseup (ev) {
@@ -367,12 +381,14 @@ class Variable {
 	remove () {
 		this.elem.parentElement.removeChild (this.elem);
 		this.parent.removeVariable (this);
+		this.destroyBox();
 	}
 }
 
 class Equation {
-	constructor (parent, tile, surround) {
+	constructor (parent, tile, surround, mfield) {
 		this.parent = parent;
+		this.minefield = mfield;
 		this.className = "equation";
 		this.minesClass = "mines";
 		this.operatorClass = "operator";
@@ -387,7 +403,7 @@ class Equation {
 		for (let i of surround) {
 			if (i.isOpen && !i.isMined) continue;
 			if (isNotFirst) this.addOperator ("+");
-			this.variables.push (new Variable (this, i));
+			this.variables.push (new Variable (this, i, this.minefield));
 			isNotFirst = true;
 		}
 		this.addOperator ("=");
@@ -460,14 +476,68 @@ class Equation {
 		}
 	}
 
+	clone () {
+		return this.elem.cloneNode (true);
+	}
 }
 
+
+class RelatedEquationsBox {
+	constructor (parent, mfield, tile, x, y) {
+		this.className = 'related_equations';
+		this.eqClassName = 'eq_system_equations';
+		this.transparentClass = 'transparent';
+		this.minefield = mfield;
+		this.tile = tile;
+		this.equations = [];
+		this.parent = parent;
+		this.pullRelatedEquations();
+		this.x = x;
+		this.y = y;
+		if (this.equations.length > 0 && parent)
+			this.createElem();
+	}
+
+	pullRelatedEquations () {
+		for (let i of this.minefield.surround (this.tile.x, this.tile.y)) {
+			if (this.minefield.isValid (i.x, i.y)) {
+				let someTile = this.minefield.getTile (i);
+				if (someTile.equation != null) {
+					this.equations.push (someTile.equation);
+				}
+			}
+		}
+	}
+
+	createElem () {
+		this.elem = document.createElement ('div');
+		this.elem.classList.add (this.className, this.eqClassName, this.transparentClass);
+		for (let i of this.equations) {
+			this.elem.appendChild (i.clone());
+		}
+		this.elem.style.left = this.x + "px";
+		this.parent.appendChild (this.elem);
+		let contBox = document.getElementById ('disassembly_body').getBoundingClientRect();
+		let height = this.elem.getBoundingClientRect().height;
+		let minTop = contBox.top + 10;
+		let maxTop = contBox.bottom - height - 10;
+		this.elem.style.top = Math.max (Math.min (this.y - height * 0.5 + 12, maxTop), minTop) + "px";
+		this.elem.classList.remove (this.transparentClass);
+	}
+
+	destroy () {
+		if (this.elem)
+			this.elem.parentElement.removeChild (this.elem);
+	}
+};
+
 class Disassembly {
-	constructor () {
+	constructor (mfield) {
 		this.id = "disassembly_equations";
 		this.container = document.getElementById (this.id);
 		this.tiles = [];
 		this.equations = [];
+		this.minefield = mfield;
 	}
 
 	clear () {
@@ -475,7 +545,7 @@ class Disassembly {
 	}
 
 	addOpenTile (tile, surround) {
-		this.equations.push (new Equation (this, tile, surround));
+		this.equations.push (new Equation (this, tile, surround, this.minefield));
 	}
 }
 
@@ -503,7 +573,7 @@ class Minefield {
 		this.minesLeft = document.getElementById ("mines_left");
 
 		this.emoticon = new Emoticon();
-		this.disassembly = new Disassembly();
+		this.disassembly = new Disassembly (this);
 
 		this.lines = [];
 

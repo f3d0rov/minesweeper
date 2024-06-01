@@ -541,3 +541,21 @@ a:hover, a:active {
 .sum {
 	font-size: 30px;
 }
+
+.related_equations {
+	position: absolute;
+	min-width: 300px;
+	height: fit-content;
+	padding: 5px;
+	border-radius: 4px;
+
+	background-color: var(--bg-color);
+	border-color: var(--line-name) !important;
+	border: solid;
+	border-width: 2px;
+	box-shadow: var(--bg-color) 0 5px 3px;
+
+	transition: opacity 0.1s ease-in-out;
+	transition-delay: 0.3s;
+}
+
